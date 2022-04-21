@@ -167,7 +167,6 @@ app.get('/:aerodrome/:from/:to', async function (req, res) {
 ;;
 
 // Scheduled flight downloader
-/*
 
 cron.schedule('6,36 * * * *', () => {
     result = init();
@@ -499,4 +498,3 @@ cron.schedule('6,36 * * * *', () => {
         })().catch(e => console.error(e.stack))
 });
 
-*/
