@@ -1,0 +1,34 @@
+---
+version: '3'
+services:
+  postgres:
+    container_name: pg
+    image: postgres:9.6
+    hostname: postgres
+    ports:
+      - "5432:5342"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: flightsByAerodrome
+    volumes:
+       - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    
+  pgAdmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: sebastian.gabler@frequentis.com
+      PGADMIN_DEFAULT_PASSWORD: FiidIsiW!
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'True'
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 10
+
+  b2bClient:
+    container_name: b2b-client
+    image: b2b-client-test:latest
+        
+volumes:
+  postgres-data:
