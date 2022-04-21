@@ -129,14 +129,20 @@ On the host system, you can test the REST endpoint by opening you browser and en
 
 http://localhost:3000/LSZH/2022-04-13T14:46:09.000Z/2022-04-13T16:46:09.000Z
 
-## TODOs
+## Versions
 
-### Input validation
-At the moment, input via REST is not checked. You will simply get a 500 error, if you pass garbage. 
+### 0.1
+Flight data requested with REST is returned as JSON, no input validation
 
-### json to XML
-Flight data, qureied over RESST is returned as json at the moment and does not match the XML format, you'd get from a SOAP request to NMB2B.
-(Solved in 0.2)
+### 0.2
+Flight data requested with REST is now returned as XML, no input validation
+
+
+### 0.3
+Added REGEX input validation for ICAO code and timestamps in REST request
+
+### 0.4
+Added flag to toggle auto download of flight data, `AUTO_DOWNL=[0|1]` can now be set in .env (Default = 0).
 
 
 
