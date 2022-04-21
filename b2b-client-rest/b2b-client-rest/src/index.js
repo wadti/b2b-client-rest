@@ -43,21 +43,36 @@ app.get('/:aerodrome/:from/:to', async function (req, res) {
     var from = req.params.from;
     var to = req.params.to;
     
-    console.log('REST:');
-    console.log('aerodrome: ' + aerodrome);
-    console.log('wef: ' + from);
-    console.log('unt: ' + to);
+    console.log('REST REQUEST:');
+    console.log('aerodrome: "', aerodrome, '"');
+    console.log('wef: "', from, '"');
+    console.log('unt: "', to, '"');
     console.log("---------------------------------");
 
-    /*
-    //TODO: Regex check for Input params
-    let regexAerodrome = new RegExp('\A\w{4}\Z')
+    // Check input with regex
+
+    let regexAerodrome = new RegExp('^[A-Z]{4}$');
+    let regexDateTime = new RegExp('^(20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]).\\d{3}Z');
 
     if(regexAerodrome.test(aerodrome) == false){
-        res.send("Aerodrome string does not match ICAO code!");
+        res.send("ERROR: Aerodrome string does not match ICAO code!");
+        console.log("ERROR: Aerodrome string does not match ICAO code!");
+        console.log("---------------------------------");
+        return;
     }
-    */
-    
+    if(regexDateTime.test(from) == false){
+        res.send("ERROR: wef is not valid!");
+        console.log("ERROR: wef is not valid!");
+        console.log("---------------------------------");
+        return;
+    }
+    if(regexDateTime.test(to) == false){
+        res.send("ERROR: unt is not valid!");
+        console.log("ERROR: unt is not valid!");
+        console.log("---------------------------------");
+        return;
+    }
+
     //Test: http://localhost:3000/LSZH/2022-04-21T09:46:09.000Z/2022-04-21T15:46:09.000Z
 
     async function init() {
@@ -152,6 +167,7 @@ app.get('/:aerodrome/:from/:to', async function (req, res) {
 ;;
 
 // Scheduled flight downloader
+/*
 
 cron.schedule('6,36 * * * *', () => {
     result = init();
@@ -483,3 +499,4 @@ cron.schedule('6,36 * * * *', () => {
         })().catch(e => console.error(e.stack))
 });
 
+*/
