@@ -29,11 +29,27 @@ require('x2js');
 
 const aerodromeEnv = process.env.B2B_AERODROME;
 const PORT = process.env.B2B_REST_PORT;
+var autoDownload = false;
+
+console.log("ENV AUTO_DOWNL: ", process.env.AUTO_DOWNL)
+console.log("VAR autoDownload: ", autoDownload)
+
+
+if (process.env.AUTO_DOWNL == '1') {
+    var autoDownload = true;
+}
+
+console.log("VAR autoDownload after check: ", autoDownload)
+
 
 var app = express(); app.listen(PORT, () => {
     console.log("NMB2B client running on port 3000");
     console.log('Started: ' + moment().utc().toDate());
-    console.log("Auto downloader running for " + aerodromeEnv);
+    if (autoDownload == true) {
+        console.log("Auto downloader running for " + aerodromeEnv);
+    } else {
+        console.log("Auto downloader not active");
+    }
     console.log("---------------------------------");
     //console.log(moment.utc().toDate())
 })
@@ -42,36 +58,39 @@ app.get('/:aerodrome/:from/:to', async function (req, res) {
     var aerodrome = req.params.aerodrome;
     var from = req.params.from;
     var to = req.params.to;
-    
+
     console.log('REST REQUEST:');
     console.log('aerodrome: "', aerodrome, '"');
     console.log('wef: "', from, '"');
     console.log('unt: "', to, '"');
-    console.log("---------------------------------");
-
-    // Check input with regex
+    //console.log("---------------------------------");
 
     let regexAerodrome = new RegExp('^[A-Z]{4}$');
     let regexDateTime = new RegExp('^(20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]).\\d{3}Z');
 
-    if(regexAerodrome.test(aerodrome) == false){
+    if (regexAerodrome.test(aerodrome) == false) {
         res.send("ERROR: Aerodrome string does not match ICAO code!");
         console.log("ERROR: Aerodrome string does not match ICAO code!");
         console.log("---------------------------------");
         return;
     }
-    if(regexDateTime.test(from) == false){
+    if (regexDateTime.test(from) == false) {
         res.send("ERROR: wef is not valid!");
         console.log("ERROR: wef is not valid!");
         console.log("---------------------------------");
         return;
     }
-    if(regexDateTime.test(to) == false){
+    if (regexDateTime.test(to) == false) {
         res.send("ERROR: unt is not valid!");
         console.log("ERROR: unt is not valid!");
         console.log("---------------------------------");
         return;
     }
+
+    /*
+    //TODO: Regex check for Input params
+
+    */
 
     //Test: http://localhost:3000/LSZH/2022-04-21T09:46:09.000Z/2022-04-21T15:46:09.000Z
 
@@ -158,17 +177,26 @@ app.get('/:aerodrome/:from/:to', async function (req, res) {
         let result = await init();
         res.send(result);
         console.log("REST: Response sent!");
+        console.log("---------------------------------");
     } catch (e) {
         console.log(e)
         res.sendStatus(500);
         console.log("REST: No response sent!");
+        console.log("---------------------------------");
     }
 });
 ;;
 
 // Scheduled flight downloader
 
-cron.schedule('6,36 * * * *', () => {
+
+cron.schedule('6/36 * * * *', () => {
+
+    if(autoDownload == false){
+        //console.log("I'M NOT RUNING!!!")
+        return;
+    }
+
     result = init();
 
     async function init() {
@@ -179,7 +207,7 @@ cron.schedule('6,36 * * * *', () => {
             XSD_PATH: process.env.B2B_XSD_PATH || '/tmp/b2b-xsd',
         });
         const [elapsedS, elapsedNs] = process.hrtime(start);
-        
+
         console.log("---------------------------------");
         console.log(
             `AUTO: SOAP CLIENT initialized in ${(elapsedS + elapsedNs / 1e9).toFixed(3)}s`,
@@ -497,4 +525,5 @@ cron.schedule('6,36 * * * *', () => {
             }
         })().catch(e => console.error(e.stack))
 });
+
 
